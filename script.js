@@ -11,34 +11,51 @@ const inputDuration = document.querySelector(".form__input--duration");
 const inputCadence = document.querySelector(".form__input--cadence");
 const inputElevation = document.querySelector(".form__input--elevation");
 
-let ma, mapEvent;
+let map, mapEvent;
 
-if (navigator.geolocation)
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      const { latitude } = position.coords;
-      const { longitude } = position.coords;
-      console.log(`https://www.google.pt/maps/@${latitude},${longitude}`);
+class App {
+  #map;
+  #mapEvent;
 
-      const coords = [latitude, longitude];
+  constructor() {
+    this._getPosition();
+  }
+  _getPosition() {
+    if (navigator.geolocation)
+      navigator.geolocation.getCurrentPosition(
+        this._loadMap.bind(this),
+        function () {
+          alert("Coult not get  your position");
+        }
+      );
+  }
+  _loadMap(position) {
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+    console.log(`https://www.google.pt/maps/@${latitude},${longitude}`);
 
-      map = L.map("map").setView(coords, 13);
+    const coords = [latitude, longitude];
 
-      L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+    this.#map = L.map("map").setView(coords, 13);
 
-      map.on("click", function (mapE) {
-        mapEvent = mapE;
-        form.classList.remove("hidden");
-        inputDistance.focus();
-      });
-    },
-    function () {
-      alert("Coult not get  your position");
-    }
-  );
+    L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.#map);
+
+    this.#map.on("click", function (mapE) {
+      this.#mapEvent = mapE;
+      form.classList.remove("hidden");
+      inputDistance.focus();
+    });
+  }
+  _showForm() {}
+  _toggleElevationField() {}
+  _newWorkout() {}
+}
+
+const app = new App();
+
 form.addEventListener("submit", function (e) {
   e.preventDefault();
 
