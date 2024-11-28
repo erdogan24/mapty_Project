@@ -11,7 +11,7 @@ const inputDuration = document.querySelector(".form__input--duration");
 const inputCadence = document.querySelector(".form__input--cadence");
 const inputElevation = document.querySelector(".form__input--elevation");
 
-let map;
+let ma, mapEvent;
 
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition(
@@ -29,7 +29,8 @@ if (navigator.geolocation)
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      map.on("click", function (mapEvent) {
+      map.on("click", function (mapE) {
+        mapEvent = mapE;
         form.classList.remove("hidden");
         inputDistance.focus();
       });
@@ -38,7 +39,15 @@ if (navigator.geolocation)
       alert("Coult not get  your position");
     }
   );
-form.addEventListener("submit", function () {
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  inputDistance.value =
+    inputDuration.value =
+    inputCadence.value =
+    inputElevation.value =
+      "";
+
   console.log(mapEvent);
   const { lat, lng } = mapEvent.latlng;
 
@@ -55,4 +64,8 @@ form.addEventListener("submit", function () {
     )
     .setPopupContent("Workout")
     .openPopup();
+});
+inputType.addEventListener("change", function () {
+  inputElevation.closest(".form_row").classList.toggle("form__row--hidden");
+  inputCadence.closest(".form_row").classList.toggle("form__row--hidden");
 });
